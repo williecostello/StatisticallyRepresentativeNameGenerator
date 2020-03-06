@@ -1,0 +1,73 @@
+---
+title: "The Statistically Representative Name Generator"
+author: "Willie Costello"
+date: "March 6, 2020"
+output: ioslides_presentation
+---
+
+```{r setup, include = FALSE}
+library(dplyr)
+```
+
+## Introduction
+
+Imagine that you're a journalist looking to anonymize a source. How do you do so responsibly?
+
+You could just come up with a name off the top of your head. But this will be affected by your own personal bias. You may even end up choosing a name that is subtly influenced by the name of your source.
+
+You could use a random name generators on the Internet. But such generators draw from a general list of names, which may not be representative of the age and sex of your source. Thus, such randomness comes at the cost of accuracy.
+
+
+## A better way
+
+But what if you could randomly generate a name that representative of the age and sex of your source? A name that was based on the names of other babies born that year, and that could even be specified as falling within a desired range of popularity?
+
+That's what the Statistically Representative Name Generator is designed to do.
+
+
+## How it works
+
+Using the [Baby Names from Social Security Card Applications dataset](https://catalog.data.gov/dataset/baby-names-from-social-security-card-applications-national-level-data") released by [Data.gov](http://www.data.gov/), the Statistically Representative Name Generator randomly generates a name within a specified year of birth, birth sex, and popularity range. More popular names from that year are statistically more likely to be generated. Thus you can be sure that the name that is generated is statistically representative within the specified parameters.
+
+
+## Under the hood (pt. 1)
+
+The SRNG's code is relatively straightforward. First, the app generates a random number based on the specified popularity range. The upper and lower bounds of the number are derived by taking the total number of names recorded in the dataset (`numsum`) and then multiplying by the specified bounds.
+
+```{r echo = TRUE, eval = FALSE}
+    randor <- reactive({
+        data <- datar() ## Grabs relevant dataset
+        numsum <- sum(data$num)
+        bounds <- input$bounds
+        upper <- ifelse(bounds[1] == 0, 
+                        numsum, numsum * (1 - (bounds[1] *.01)))
+        lower <- ifelse(bounds[2] == 100, 
+                        1, numsum * (1 - (bounds[2] * .01)))
+        sample(lower:upper, 1)
+    })
+```
+
+
+## Under the hood (pt. 2)
+
+Next, the app loops through the dataset to find where the random number falls and returns the name associated with that number. Here a name is generated from the set of male babies born in 1986, with a full popularity range specified.
+
+```{r echo = FALSE, eval = TRUE}
+        rawdata <- read.csv("srng/data/USA/yob1986.txt", header = FALSE, col.names = c("name", "sex", "num"))
+        data <- rawdata %>% filter(sex == "M")
+        numsum <- sum(data$num)
+        random <- sample(1:numsum, 1)
+```
+
+```{r echo = TRUE}
+        lowct <- 0 ## Initialize low counter variable
+        highct <- 0 ## Initialize high counter variable
+        for (i in 1:nrow(data)) {
+                highct <- lowct + data$num[i]
+                if (lowct < random & random <= highct) {
+                        name <- data$name[i]
+                }
+                lowct <- highct
+        }
+        print(paste("Your randomly generated name is", name))
+```
