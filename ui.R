@@ -22,8 +22,7 @@ shinyUI(fluidPage(
             sliderInput("bounds", "Popularity range:",
                         min = 0,
                         max = 100,
-                        value = c(0, 100)),
-            ## submitButton("Run!"),
+                        value = c(0, 100))
         ),
     
         mainPanel(
@@ -32,7 +31,7 @@ shinyUI(fluidPage(
                 tabPanel("App",
                          h3("Your randomly generated name is..."),
                          textOutput("outputtext"),
-                        ),
+                ),
                 
                 tabPanel("Documentation",
                          h3("Instructions for use"),
@@ -58,7 +57,7 @@ shinyUI(fluidPage(
                            " released by ",
                            a("Data.gov", href = "http://www.data.gov/"), 
                            " (last updated: November 27, 2019)."),
-                        ), 
+                )
                 
             )
         )
