@@ -13,10 +13,18 @@ shinyServer(function(input, output) {
         include_us <- input$from_us
         include_on <- input$from_on
         
+        ## Perform various validation tests
         validate(
             need((include_us | include_on) == TRUE, 
                  "Please select at least one region.")
         )
+        
+        if (include_on == TRUE) {
+            validate(
+                need(year >= 1917 & year <= 2016, 
+                     "Ontario data available only between 1917 and 2016; please select a different year.")
+            )
+        }
         
         ## Grab US data, if selected
         if (include_us == TRUE) {
