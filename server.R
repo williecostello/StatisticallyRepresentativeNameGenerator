@@ -1,4 +1,5 @@
 library(shiny)
+library(data.table)
 library(dplyr)
 
 shinyServer(function(input, output) {
@@ -7,21 +8,47 @@ shinyServer(function(input, output) {
     datar <- reactive({
         
         ## Grab input variables
-        place <- input$place
         year <- input$year
         sexchoice <- input$sexchoice
+        include_us <- input$from_us
+        include_on <- input$from_on
         
-        ## Grab relevant dataset
-        file <- paste("data/", place, "/", year, ".csv", sep = "")
-        rawdata <- read.csv(file, header = TRUE)
+        validate(
+            need((include_us | include_on) == TRUE, 
+                 "Please select at least one region.")
+        )
+        
+        ## Grab US data, if selected
+        if (include_us == TRUE) {
+            file <- paste("data/US/", year, ".csv", sep = "")
+            data_us <- fread(file)
+        } else {
+            data_us <- data.table(name = character(), sex = character(), 
+                                  num_us = numeric())
+        }
+        
+        ## Grab ON data, if selected
+        if (include_on == TRUE) {
+            file <- paste("data/ON/", year, ".csv", sep = "")
+            data_on <- fread(file)
+        } else {
+            data_on <- data.table(name = character(), sex = character(), 
+                                  num_on = numeric())
+        }
+        
+        ## Merge & sum data
+        rawdata <- merge(data_us, data_on, all = TRUE)
+        rawdata[is.na(rawdata)] <- 0
+        rawdata[, num := num_on + num_us]
+        rawdata <- rawdata %>% arrange(desc(num)) %>% select(name, sex, num)
         
         ## Filter data by sex
         if (sexchoice == "male ") {
-            data <- rawdata %>% filter(sex == "M")
+            data <- rawdata %>% filter(sex == "M") %>% select(name, num)
         } else if (sexchoice == "female ") {
-            data <- rawdata %>% filter(sex == "F")
+            data <- rawdata %>% filter(sex == "F") %>% select(name, num)
         } else {
-            data <- rawdata %>% arrange(desc(num))
+            data <- rawdata %>% select(name, num)
         }
         
         data

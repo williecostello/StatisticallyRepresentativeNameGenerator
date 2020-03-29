@@ -26,10 +26,9 @@ shinyUI(fluidPage(
                         min = 0,
                         max = 100,
                         value = c(0, 100)),
-            radioButtons("place", "From:", 
-                         c("USA" = "USA", 
-                           "Ontario, Canada" = "ON"),
-                         selected = "USA")
+            h4("From the following regions..."),
+            checkboxInput("from_us", "USA", value = TRUE),
+            checkboxInput("from_on", "Ontario, Canada", value = TRUE)
         ),
     
         mainPanel(
