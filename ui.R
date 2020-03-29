@@ -1,7 +1,10 @@
 library(shiny)
+library(shinythemes)
 
 shinyUI(fluidPage(
 
+    theme = shinytheme("lumen"),
+    
     titlePanel("The Statistically Representative Name Generator"),
 
     sidebarLayout(
@@ -26,7 +29,7 @@ shinyUI(fluidPage(
         ),
     
         mainPanel(
-            tabsetPanel(
+            tabsetPanel(type = "tabs",
 
                 tabPanel("App",
                          h3("Your randomly generated name is..."),
