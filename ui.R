@@ -25,7 +25,11 @@ shinyUI(fluidPage(
             sliderInput("bounds", "Popularity range:",
                         min = 0,
                         max = 100,
-                        value = c(0, 100))
+                        value = c(0, 100)),
+            radioButtons("place", "From:", 
+                         c("USA" = "USA", 
+                           "Ontario, Canada" = "ON"),
+                         selected = "USA")
         ),
     
         mainPanel(

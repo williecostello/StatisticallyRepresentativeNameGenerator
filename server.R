@@ -1,20 +1,19 @@
 library(shiny)
 library(dplyr)
 
-country <- "USA"
-
 shinyServer(function(input, output) {
 
     ## Generate data
     datar <- reactive({
         
         ## Grab input variables
+        place <- input$place
         year <- input$year
         sexchoice <- input$sexchoice
         
         ## Grab relevant dataset
-        file <- paste("data/", country, "/yob", year, ".txt", sep = "")
-        rawdata <- read.csv(file, header = FALSE, col.names = c("name", "sex", "num"))
+        file <- paste("data/", place, "/", year, ".csv", sep = "")
+        rawdata <- read.csv(file, header = TRUE)
         
         ## Filter data by sex
         if (sexchoice == "male ") {
