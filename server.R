@@ -21,7 +21,7 @@ shinyServer(function(input, output) {
         } else if (sexchoice == "female ") {
             data <- rawdata %>% filter(sex == "F")
         } else {
-            data <- rawdata
+            data <- rawdata %>% arrange(desc(num))
         }
         
         data
