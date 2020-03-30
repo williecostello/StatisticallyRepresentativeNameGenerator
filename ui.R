@@ -28,7 +28,8 @@ shinyUI(fluidPage(
                         value = c(0, 100)),
             h4("From the following regions..."),
             checkboxInput("from_us", "USA", value = TRUE),
-            checkboxInput("from_on", "Ontario, Canada", value = TRUE)
+            checkboxInput("from_on", "Ontario, Canada", value = TRUE),
+            checkboxInput("from_bc", "British Columbia, Canada", value = TRUE)
         ),
     
         mainPanel(

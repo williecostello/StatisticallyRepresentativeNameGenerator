@@ -12,10 +12,11 @@ shinyServer(function(input, output) {
         sexchoice <- input$sexchoice
         include_us <- input$from_us
         include_on <- input$from_on
+        include_bc <- input$from_bc
         
         ## Perform various validation tests
         validate(
-            need((include_us | include_on) == TRUE, 
+            need((include_us | include_on | include_bc) == TRUE, 
                  "Please select at least one region.")
         )
         
@@ -26,6 +27,13 @@ shinyServer(function(input, output) {
             )
         }
         
+        if (include_bc == TRUE) {
+            validate(
+                need(year >= 1919 & year <= 2018, 
+                     "British Columbia data available only between 1919 and 2018; please select a different year.")
+            )
+        }
+
         ## Grab US data, if selected
         if (include_us == TRUE) {
             file <- paste("data/US/", year, ".csv", sep = "")
@@ -44,10 +52,20 @@ shinyServer(function(input, output) {
                                   num_on = numeric())
         }
         
+        ## Grab BC data, if selected
+        if (include_bc == TRUE) {
+            file <- paste("data/BC/", year, ".csv", sep = "")
+            data_bc <- fread(file)
+        } else {
+            data_bc <- data.table(name = character(), sex = character(), 
+                                  num_bc = numeric())
+        }
+        
         ## Merge & sum data
         rawdata <- merge(data_us, data_on, all = TRUE)
+        rawdata <- merge(rawdata, data_bc, all = TRUE)
         rawdata[is.na(rawdata)] <- 0
-        rawdata[, num := num_on + num_us]
+        rawdata[, num := num_us + num_on + num_bc]
         rawdata <- rawdata %>% arrange(desc(num)) %>% select(name, sex, num)
         
         ## Filter data by sex

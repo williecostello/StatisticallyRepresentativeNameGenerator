@@ -42,3 +42,37 @@ for (i in 1917:2016) {
         data <- data_ON %>% filter(year == i) %>% select(-year)
         fwrite(data, file = filepath, row.names = FALSE)
 }
+
+################################################################################
+## B.C. Data
+################################################################################
+
+## Read data
+file_BC_f <- "data/raw/BC/bc-popular-girls-names.csv"
+data_BC_f <- fread(file_BC_f, header = TRUE)
+file_BC_m <- "data/raw/BC/bc-popular-boys-names.csv"
+data_BC_m <- fread(file_BC_m, header = TRUE)
+
+## Combine & restructure data
+data_BC_f <- data_BC_f[-1, ]
+setnames(data_BC_f, "Name", "name")
+data_BC_m <- data_BC_m[-1, ]
+setnames(data_BC_m, "Name", "name")
+data_BC_f <- data_BC_f %>% mutate(sex = "F")
+data_BC_m <- data_BC_m %>% mutate(sex = "M")
+## data_ON <- data_ON %>% arrange(desc(num_on)) %>% select(name, sex, num_on, year)
+data_BC_f[, 1] <- str_to_sentence(data_BC_f[, 1])
+data_BC_m[, 1] <- str_to_sentence(data_BC_m[, 1])
+
+## Write tables for each year
+for (i in 1919:2018) {
+        filepath <- paste("data/BC/", i, ".csv", sep = "")
+        data_f <- data_BC_f %>% select(name, sex, num_bc = as.character(i))
+        data_m <- data_BC_m %>% select(name, sex, num_bc = as.character(i))
+        data_f <- data_f[data_f$num_bc != 0, ]
+        data_m <- data_m[data_m$num_bc != 0, ]
+        data <- rbind(data_f, data_m)
+        data$num_bc <- as.numeric(data$num_bc)
+        data <- data %>% arrange(desc(num_bc))
+        fwrite(data, file = filepath, row.names = FALSE)
+}
